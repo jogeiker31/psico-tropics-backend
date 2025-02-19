@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Counter } from './schemas/counter.schema';
 import { Model, Types } from 'mongoose';
@@ -154,7 +154,6 @@ export class CompraService {
       );
     }
 
-    
     // Validamos si se supera el límite mensual
     for (const [principioActivo, cantidad] of compraActual.entries()) {
       const limite = limites.get(principioActivo) || 0;
@@ -167,5 +166,91 @@ export class CompraService {
     }
 
     return true;
+  }
+
+  async validarCompraPorCedula(
+    cedula: string,
+    varianteId: string,
+    cantidadDeseada: number,
+    tipoCliente: TipoCliente,
+  ): Promise<boolean> {
+    // 1. Buscar el cliente por su cédula
+    const cliente = await this.clienteModel.findOne({ cedula });
+    if (!cliente) {
+      throw new NotFoundException(
+        `No se encontró un cliente con la cédula ${cedula}`,
+      );
+    }
+
+    // 2. Obtener la variante y su principio activo
+    const variante = await this.varianteMedicamentoModel
+      .findById(varianteId)
+      .populate('principio_activo');
+    if (!variante) {
+      throw new NotFoundException(
+        `No se encontró la variante de medicamento con ID ${varianteId}`,
+      );
+    }
+
+    const principioActivo = variante.principio_activo['principio_activo'];
+    const limitePermitido = variante.principio_activo['limite'];
+
+    // 3. Determinar el rango de fechas del mes actual
+    const inicioMes = new Date();
+    inicioMes.setDate(1);
+    inicioMes.setHours(0, 0, 0, 0);
+
+    const finMes = new Date();
+    finMes.setMonth(finMes.getMonth() + 1);
+    finMes.setDate(0);
+    finMes.setHours(23, 59, 59, 999);
+
+    // 4. Consultar todas las compras del cliente en el mes actual para ese principio activo
+    const compras = await this.compraModel.aggregate([
+      {
+        $match: {
+          cliente: new Types.ObjectId(cliente._id),
+          createdAt: { $gte: inicioMes, $lte: finMes },
+          tipoCliente: tipoCliente,
+        },
+      },
+      { $unwind: '$medicamentos' },
+      {
+        $lookup: {
+          from: 'variantemedicamentos',
+          localField: 'medicamentos.id',
+          foreignField: '_id',
+          as: 'varianteInfo',
+        },
+      },
+      { $unwind: '$varianteInfo' },
+      {
+        $lookup: {
+          from: 'medicamentos',
+          localField: 'varianteInfo.principio_activo',
+          foreignField: '_id',
+          as: 'medicamentoInfo',
+        },
+      },
+      { $unwind: '$medicamentoInfo' },
+      {
+        $group: {
+          _id: '$medicamentoInfo.principio_activo',
+          totalComprado: { $sum: '$medicamentos.cantidad' }, // Sumamos la cantidad comprada
+        },
+      },
+    ]);
+
+    // 5. Verificar si el cliente ya alcanzó su límite
+    const compraExistente = compras.find(
+      (c) => c._id.toString() === principioActivo.toString(),
+    );
+    const cantidadActual = compraExistente ? compraExistente.totalComprado : 0;
+
+    if (cantidadActual + cantidadDeseada > limitePermitido) {
+      return false; // Excede el límite
+    }
+
+    return true; // Puede comprar
   }
 }

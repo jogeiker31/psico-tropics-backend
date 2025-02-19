@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   Req,
   UseGuards,
   ValidationPipe,
@@ -11,6 +13,7 @@ import { CompraService } from './compra.service';
 import { JwtAuthGuard } from 'src/jwt-auth.guard';
 import { CompraDto } from './dto/compra.dto';
 import { RecordService } from '../record/record.service';
+import { TipoCliente } from './schemas/compra.schema';
 
 @Controller('compra')
 export class CompraController {
@@ -18,6 +21,29 @@ export class CompraController {
     private compraService: CompraService,
     private recordService: RecordService,
   ) {}
+
+  @Get('validar')
+  async validarCompra(
+    @Query('cedula') cedula: string,
+    @Query('varianteId') varianteId: string,
+    @Query('cantidad') cantidad: number,
+    @Query('tipoCliente') tipoCliente: TipoCliente,
+  ) {
+    if (!cedula || !tipoCliente || !varianteId || !cantidad || cantidad <= 0) {
+      throw new BadRequestException(
+        'Cédula, varianteId y cantidad son obligatorios y cantidad debe ser mayor a 0.',
+      );
+    }
+
+    const puedeComprar = await this.compraService.validarCompraPorCedula(
+      cedula,
+      varianteId,
+      Number(cantidad),
+      tipoCliente,
+    );
+
+    return { puedeComprar };
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -33,7 +59,6 @@ export class CompraController {
         return result;
       })
       .catch((error) => {
-
         throw new BadRequestException([error.toString()]);
       });
   }
