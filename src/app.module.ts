@@ -10,6 +10,7 @@ import { DatabaseModule } from './modules/database/database.module';
 import { UsuarioModule } from './modules/usuario/usuario.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { MedicamentoModule } from './modules/medicamento/medicamento.module';
+import { CompraModule } from './modules/compra/compra.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MedicamentoModule } from './modules/medicamento/medicamento.module';
     UsuarioModule,
     ClienteModule,
     MedicamentoModule,
+    CompraModule,
   ],
   controllers: [AppController],
   providers: [AppService],
