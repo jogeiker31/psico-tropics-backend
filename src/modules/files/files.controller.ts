@@ -34,7 +34,6 @@ export class FilesController {
     // Construir la ruta absoluta
     const absolutePath = path.resolve(filePath);
 
-    console.log('Absolute file path:', absolutePath); // Depuración
 
     res.set({
       'Content-Type': mimeType,
@@ -43,7 +42,6 @@ export class FilesController {
 
     res.sendFile(absolutePath, (err) => {
       if (err) {
-        console.error('Error al enviar el archivo:', err);
         throw new NotFoundException('Error al enviar el archivo.');
       }
     });
@@ -60,7 +58,6 @@ export class FilesController {
     // Ruta absoluta del archivo
     const absolutePath = path.resolve(filePath);
 
-    console.log('Mostrando archivo:', absolutePath); // Depuración
 
     res.set({
       'Content-Type': mimeType, // Solo definimos el tipo MIME
@@ -68,7 +65,6 @@ export class FilesController {
 
     res.sendFile(absolutePath, (err) => {
       if (err) {
-        console.error('Error al mostrar el archivo:', err);
         throw new NotFoundException('No se pudo mostrar el archivo.');
       }
     });
@@ -84,7 +80,6 @@ export class FilesController {
 
     const absolutePath = path.resolve(file.filePath);
 
-    console.log('Descargando archivo:', absolutePath); // Para depuración
 
     res.set({
       'Content-Type': file.mimeType,
@@ -93,7 +88,6 @@ export class FilesController {
 
     res.sendFile(absolutePath, (err) => {
       if (err) {
-        console.error('Error al descargar el archivo:', err);
         throw new NotFoundException('No se pudo descargar el archivo.');
       }
     });

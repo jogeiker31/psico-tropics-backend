@@ -34,6 +34,29 @@ export class UsuarioService {
   async create(data) {
     const { nombre_apellido } = data;
 
+    const ciExist = await this.usuarioModel.exists({ cedula: data.cedula });
+    if (ciExist) {
+      throw { type: 'custom', message: 'Existe un doctor con esta cedula' };
+    }
+
+    const cfExist = await this.usuarioModel.exists({
+      codigo_farmaceutico: data.codigo_farmaceutico,
+    });
+    const ccExist = await this.usuarioModel.exists({
+      codigo_colaborador: data.codigo_colaborador,
+    });
+    if (cfExist) {
+      throw {
+        type: 'custom',
+        message: 'Existe un doctor con este código de farmaceutico',
+      };
+    }
+    if (ccExist) {
+      throw {
+        type: 'custom',
+        message: 'Existe un doctor con este código de colaborador',
+      };
+    }
     // Generar el nombre de usuario
     let nombre_usuario = this.generarNombreUsuario(nombre_apellido);
 
@@ -69,6 +92,35 @@ export class UsuarioService {
     return this.usuarioModel.findOne({ nombre_usuario }).exec();
   }
   async actualizarUsuario(id: string, data: UpdateUserDto): Promise<Usuario> {
+    const ciExist = await this.usuarioModel.exists({
+      _id: { $ne: id },
+      cedula: data.cedula,
+    });
+    if (ciExist) {
+      throw { type: 'custom', message: 'Existe un doctor con esta cedula' };
+    }
+
+    const cfExist = await this.usuarioModel.exists({
+      _id: { $ne: id },
+      codigo_farmaceutico: data.codigo_farmaceutico,
+    });
+    const ccExist = await this.usuarioModel.exists({
+      _id: { $ne: id },
+      codigo_colaborador: data.codigo_colaborador,
+    });
+    if (cfExist) {
+      throw {
+        type: 'custom',
+        message: 'Existe un doctor con este código de farmaceutico',
+      };
+    }
+    if (ccExist) {
+      throw {
+        type: 'custom',
+        message: 'Existe un doctor con este código de colaborador',
+      };
+    }
+
     const usuarioActualizado = await this.usuarioModel
       .findByIdAndUpdate(id, data, { new: true })
       .exec();
@@ -79,12 +131,19 @@ export class UsuarioService {
   }
 
   async eliminarUsuario(id: string): Promise<Usuario> {
-    const resultado = await this.usuarioModel
-      .findByIdAndUpdate(id, { deleted: true })
-      .exec();
-    if (!resultado) {
+    const usuario = await this.usuarioModel.findById(id).exec();
+    if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
+
+    // Modificar los valores únicos agregando "_xxx"
+    usuario.cedula += '_xxx';
+    usuario.codigo_farmaceutico += '_xxx';
+    usuario.codigo_colaborador += '_xxx';
+    usuario.nombre_usuario += '_xxx';
+    usuario.deleted = true;
+
+    const resultado = await usuario.save();
     return resultado;
   }
 

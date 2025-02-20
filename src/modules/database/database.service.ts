@@ -10,7 +10,7 @@ export class DatabaseService {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupFile = `backup-${timestamp}.gz`;
 
-      const command = `mongodump --uri="mongodb://localhost:27017/bienestar" --archive=${backupPath}${backupFile} --gzip`;
+      const command = `mongodump --uri="mongodb://localhost:27017/psico-tropics" --archive=${backupPath}${backupFile} --gzip`;
 
       exec(command, (error) => {
         if (error) {
@@ -25,8 +25,8 @@ export class DatabaseService {
   async restoreDatabase(filename: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const backupPath = path.join(__dirname, '../../../backups/', filename);
-      console.log(backupPath);
-      const command = `mongorestore --uri="mongodb://localhost:27017/bienestar" --archive=${backupPath} --gzip --drop`;
+    
+      const command = `mongorestore --uri="mongodb://localhost:27017/psico-tropics" --archive=${backupPath} --gzip --drop`;
 
       exec(command, (error) => {
         if (error) {

@@ -13,7 +13,6 @@ export class RecordService {
   }
 
   getAll(startDate: string, endDate: string) {
-    console.log(new Date(endDate), endDate);
     return this.recordMOdel
       .find({
         createdAt: {
@@ -22,7 +21,7 @@ export class RecordService {
         },
       })
 
-      .populate('user', 'name email')
+      .populate('user')
       .sort({ createdAt: -1 });
   }
 }

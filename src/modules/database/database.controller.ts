@@ -28,7 +28,7 @@ export class DatabaseController {
 
       res.download(backupFilePath, filename, (err) => {
         if (err) {
-          console.log(err);
+
           throw new HttpException(
             'Error al descargar el respaldo',
             HttpStatus.INTERNAL_SERVER_ERROR,
@@ -36,7 +36,7 @@ export class DatabaseController {
         }
       });
     } catch (error) {
-      console.log(error);
+      
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

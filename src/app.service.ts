@@ -14,7 +14,6 @@ export class AppService implements OnModuleInit {
   }
 
   private async ejecutarTareaAutomatica() {
-    const users = await this.usuarioService.crearAdministrador();
-    console.log(users);
+    await this.usuarioService.crearAdministrador();
   }
 }

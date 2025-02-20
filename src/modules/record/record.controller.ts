@@ -38,13 +38,13 @@ export class RecordController {
     const logoWidth = 100;
     const centerX = (doc.page.width - logoWidth) / 2;
     doc
-      .image('./logoapp.png', centerX, 50, { width: 100 }) // Imagen con posición definida
-      .moveDown(6); // Espacio después de la imagen
+      .image('./logo.jpeg', centerX, 50, { width: 100 }) // Imagen con posición definida
+      .moveDown(10); // Espacio después de la imagen
 
     // Título centrado
     doc
       .fontSize(20)
-      .text('Desarrollando Bienestar', { align: 'center' })
+      .text('PSICO-TROPICS', { align: 'center' })
       .moveDown(1); // Espacio después del título
 
     // Título del documento
@@ -59,7 +59,7 @@ export class RecordController {
     const table = {
       headers: ['Usuario', 'Acción', 'Fecha'], // Encabezados
       rows: records.map((record: any) => [
-        record.user.name, // Nombre del usuario
+        record.user.nombre_usuario, // Nombre del usuario
         record.action, // Acción
         new Date(record.createdAt).toLocaleString(), // Fecha con formato legible
       ]),

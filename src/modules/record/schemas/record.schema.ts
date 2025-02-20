@@ -3,7 +3,7 @@ import { ObjectId, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Record {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Usuario' })
   user: ObjectId;
 
   @Prop({ required: true })

@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user: any = await this.usuarioService.obtenerPorNombreUsuario(
       payload.nombre_usuario,
     ); // Busca el usuario por email
-    console.log(user, payload);
+
     const { password, ...result } = user.toObject();
     return result; // Devuelve el usuario para que esté disponible en la solicitud
   }

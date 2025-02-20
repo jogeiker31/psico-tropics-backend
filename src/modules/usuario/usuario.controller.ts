@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  Request,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -36,9 +37,16 @@ export class UsuarioController {
         return usuario;
       })
       .catch((error) => {
-        throw new BadRequestException([error]);
+        throw new BadRequestException(error);
       });
   }
+
+  @UseGuards(JwtAuthGuard) // Protege este endpoint
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user; // Devuelve el usuario autenticado
+  }
+
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
@@ -57,7 +65,7 @@ export class UsuarioController {
         return usuario;
       })
       .catch((error) => {
-        throw new BadRequestException([error]);
+        throw new BadRequestException(error);
       });
   }
 
@@ -69,7 +77,7 @@ export class UsuarioController {
         return usuario;
       })
       .catch((error) => {
-        throw new BadRequestException([error]);
+        throw new BadRequestException(error);
       });
   }
 

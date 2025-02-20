@@ -25,7 +25,7 @@ export class Usuario {
 
   
   @Prop({ default: false })
-  deleted: UserRole;
+  deleted: boolean;
 }
 
 export const UsuarioSchema = SchemaFactory.createForClass(Usuario);

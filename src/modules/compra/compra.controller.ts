@@ -48,7 +48,7 @@ export class CompraController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body(new ValidationPipe()) data: CompraDto, @Req() req) {
-    console.log(data);
+
     return this.compraService
       .crearCompra({ ...data, doctor: req.user._id })
       .then((result) => {
