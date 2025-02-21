@@ -25,6 +25,8 @@ export class VarianteMedicamento {
   descripcion: string;
   @Prop({})
   documento_requerido: string;
+  @Prop({default:false})
+  deleted: boolean;
 }
 
 export const VarianteMedicamentoSchema = SchemaFactory.createForClass(VarianteMedicamento);

@@ -51,3 +51,32 @@ export class CreateMedicamentoVarianteDto {
   @IsOptional()
   documento_requerido?: string;
 }
+export class EditarMedicamentoVarianteDto {
+  @IsMongoId()
+  @IsOptional()
+  foto?: string;
+
+  @IsString()
+  @IsOptional()
+  marca?: string;
+
+  @IsString()
+  @IsOptional()
+  presentacion?: string;
+
+  @IsString()
+  @IsOptional()
+  numero_tabletas?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  importado?: boolean;
+
+  @IsString()
+  @IsOptional()
+  descripcion?: string;
+
+  @IsString()
+  @IsOptional()
+  documento_requerido?: string;
+}

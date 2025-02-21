@@ -2,9 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   ValidationPipe,
@@ -14,6 +17,7 @@ import { JwtAuthGuard } from 'src/jwt-auth.guard';
 import {
   CreateMedicamentoDto,
   CreateMedicamentoVarianteDto,
+  EditarMedicamentoVarianteDto,
 } from './dto/medicamento.dto';
 import { RecordService } from '../record/record.service';
 
@@ -63,6 +67,52 @@ export class MedicamentoController {
         throw new BadRequestException([error]);
       });
   }
+  @Patch('variante/:id')
+  @UseGuards(JwtAuthGuard)
+  editarVariante(
+    @Body(new ValidationPipe()) data: EditarMedicamentoVarianteDto,
+    @Param('id') id,
+
+    @Req() req,
+  ) {
+    return this.medicamentoService
+      .editarVariante(id, data)
+      .then(async (data) => {
+        await data.populate('principio_activo');
+        const medicamento = data['principio_activo'] as any;
+        this.recordService.create({
+          user: req.user._id,
+          action: `Edito la variante \"${data.marca}\" del medicamento "${medicamento.principio_activo}"`,
+        });
+        return data;
+      })
+      .catch((error) => {
+        throw new BadRequestException(error);
+      });
+  }
+
+  @Delete('variante/:id')
+  @UseGuards(JwtAuthGuard)
+  eliminarVariante(
+    @Param('id') id,
+
+    @Req() req,
+  ) {
+    return this.medicamentoService
+      .eliminarVariante(id)
+      .then(async (data) => {
+        await data.populate('principio_activo');
+        const medicamento = data['principio_activo'] as any;
+        this.recordService.create({
+          user: req.user._id,
+          action: `Elimino la variante \"${data.marca}\" del medicamento "${medicamento.principio_activo}"`,
+        });
+        return data;
+      })
+      .catch((error) => {
+        throw new BadRequestException(error);
+      });
+  }
 
   @Get('')
   @UseGuards(JwtAuthGuard)
@@ -76,6 +126,7 @@ export class MedicamentoController {
         throw new BadRequestException([error]);
       });
   }
+
   @Get('variantes')
   @UseGuards(JwtAuthGuard)
   obtenerMedicamentosConVariantes(@Req() req) {
@@ -87,5 +138,10 @@ export class MedicamentoController {
       .catch((error) => {
         throw new BadRequestException([error]);
       });
+  }
+
+  @Get('buscar')
+  async buscarVariantes(@Query('query') query: string) {
+    return this.medicamentoService.buscarVariantes(query);
   }
 }

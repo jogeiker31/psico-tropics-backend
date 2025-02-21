@@ -173,7 +173,7 @@ export class CompraService {
     varianteId: string,
     cantidadDeseada: number,
     tipoCliente: TipoCliente,
-  ): Promise<boolean> {
+  ): Promise<number> {
     // 1. Buscar el cliente por su cédula
     const cliente = await this.clienteModel.findOne({ cedula });
     if (!cliente) {
@@ -246,11 +246,7 @@ export class CompraService {
       (c) => c._id.toString() === principioActivo.toString(),
     );
     const cantidadActual = compraExistente ? compraExistente.totalComprado : 0;
-
-    if (cantidadActual + cantidadDeseada > limitePermitido) {
-      return false; // Excede el límite
-    }
-
-    return true; // Puede comprar
+    console.log(limitePermitido, cantidadActual, cantidadDeseada);
+    return limitePermitido - cantidadActual; // Puede comprar
   }
 }
