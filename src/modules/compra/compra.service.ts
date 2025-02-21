@@ -28,9 +28,30 @@ export class CompraService {
     return counter.value.toString().padStart(5, '0'); // Asegura que tenga 5 dígitos con ceros
   }
 
-  async crearCompra(dto: any): Promise<Compra> {
-    const numeroOrden = await this.generarNumeroOrden();
+  async obtenerCompras() {
+    return this.compraModel
+      .find()
+      .populate('cliente doctor')
 
+      .populate({
+        path: 'medicamentos.id',
+        select: 'principio_activo marca',
+        populate: { path: 'principio_activo', select: 'principio_activo' },
+      });
+  }
+  async obtenerCompraPorNumeroDeOrden(numero_orden: string) {
+    return this.compraModel
+      .findOne({ numero_orden })
+      .populate('cliente doctor')
+
+      .populate({
+        path: 'medicamentos.id',
+
+        populate: { path: 'principio_activo' },
+      });
+  }
+
+  async crearCompra(dto: any): Promise<Compra> {
     // Buscar o crear cliente
     let clienteExistente = await this.clienteModel.findOne({
       cedula: dto.cliente.cedula,
@@ -57,7 +78,7 @@ export class CompraService {
     if (!puedeComprar) {
       throw new Error('No puedes comprar más de este medicamento este mes.');
     }
-
+    const numeroOrden = await this.generarNumeroOrden();
     // Crear la compra con el cliente asociado
     const nuevaCompra = new this.compraModel({
       ...dto,

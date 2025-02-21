@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -48,7 +49,6 @@ export class CompraController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body(new ValidationPipe()) data: CompraDto, @Req() req) {
-
     return this.compraService
       .crearCompra({ ...data, doctor: req.user._id })
       .then((result) => {
@@ -56,6 +56,31 @@ export class CompraController {
           user: req.user._id,
           action: `Registro la compra \"${result.numero_orden}\"`,
         });
+        return result;
+      })
+      .catch((error) => {
+        throw new BadRequestException([error.toString()]);
+      });
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  obtenerCompras(@Req() req) {
+    return this.compraService
+      .obtenerCompras()
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        throw new BadRequestException([error.toString()]);
+      });
+  }
+  @Get('numero-orden/:numero_orden')
+  @UseGuards(JwtAuthGuard)
+  obtenerCompraPorNumeroOrden(@Param('numero_orden') numero_orden, @Req() req) {
+    return this.compraService
+      .obtenerCompraPorNumeroDeOrden(numero_orden)
+      .then((result) => {
         return result;
       })
       .catch((error) => {

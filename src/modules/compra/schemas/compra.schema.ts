@@ -5,6 +5,8 @@ export enum TipoCliente {
   Representante = 'Representante',
   Mascota = 'Mascota',
 }
+
+@Schema({ _id: false })
 class MedicamentoCompra {
   @Prop({ required: true, ref: 'VarianteMedicamento' })
   id: Types.ObjectId;
@@ -24,12 +26,13 @@ export class Compra {
   @Prop({ default: TipoCliente.Titular })
   tipoCliente: TipoCliente;
 
-  
   @Prop({ required: true, type: [MedicamentoCompra] })
   medicamentos: MedicamentoCompra[];
 
   @Prop({ required: true, unique: true })
   numero_orden: string;
+  @Prop({ required: false, ref: 'CustomFile' })
+  recipe: Types.ObjectId;
 }
 
 export const CompraSchema = SchemaFactory.createForClass(Compra);
