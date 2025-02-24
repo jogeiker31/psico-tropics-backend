@@ -15,7 +15,6 @@ export class MetricsController {
   @Get('by-month/:date')
   getMetricsByMonth(@Param('date') date) {
     const newDate = new Date(date);
-    console.log(newDate)
     return this.metricsService.getMedicamentosVendidosEnMes(
       newDate.getMonth() + 1,
       newDate.getFullYear(),

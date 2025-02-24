@@ -54,12 +54,10 @@ export class MedicamentoService {
       },
     ]);
 
-    console.log(data);
     return data;
   }
 
   async obtenerVariantesDemedicamento(id: string) {
-    console.log(id);
     const data = await this.varianteMedicamento.find({
       principio_activo: new Types.ObjectId(id ),
       deleted: false,
@@ -99,7 +97,6 @@ export class MedicamentoService {
   }
 
   async buscarVariantes(query: string) {
-    console.log(query);
     const regex = new RegExp(query, 'i'); // Búsqueda insensible a mayúsculas/minúsculas
 
     // Buscar los medicamentos cuyo principio activo coincida con la query

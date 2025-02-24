@@ -154,7 +154,6 @@ export class MedicamentoController {
         return data;
       })
       .catch((error) => {
-        console.log(error);
         throw new BadRequestException(error);
       });
   }
