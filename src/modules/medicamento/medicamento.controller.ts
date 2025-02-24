@@ -18,6 +18,7 @@ import {
   CreateMedicamentoDto,
   CreateMedicamentoVarianteDto,
   EditarMedicamentoVarianteDto,
+  editMedicamentoDto,
 } from './dto/medicamento.dto';
 import { RecordService } from '../record/record.service';
 
@@ -91,6 +92,28 @@ export class MedicamentoController {
       });
   }
 
+  @Patch('medicamento/:id')
+  @UseGuards(JwtAuthGuard)
+  editarMedicamento(
+    @Body(new ValidationPipe()) data: editMedicamentoDto,
+    @Param('id') id,
+
+    @Req() req,
+  ) {
+    return this.medicamentoService
+      .editarMedicamento(id, data)
+      .then(async (data) => {
+        this.recordService.create({
+          user: req.user._id,
+          action: `Edito el medicamento \"${data.principio_activo}\" `,
+        });
+        return data;
+      })
+      .catch((error) => {
+        throw new BadRequestException(error);
+      });
+  }
+
   @Delete('variante/:id')
   @UseGuards(JwtAuthGuard)
   eliminarVariante(
@@ -114,6 +137,28 @@ export class MedicamentoController {
       });
   }
 
+  @Delete('medicamento/:id')
+  @UseGuards(JwtAuthGuard)
+  eliminarMedicamento(
+    @Param('id') id,
+
+    @Req() req,
+  ) {
+    return this.medicamentoService
+      .eliminarMedicamento(id)
+      .then(async (data) => {
+        this.recordService.create({
+          user: req.user._id,
+          action: `Elimino el medicamento \"${data.principio_activo}\" `,
+        });
+        return data;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new BadRequestException(error);
+      });
+  }
+
   @Get('')
   @UseGuards(JwtAuthGuard)
   obtenerMedicamentos(@Req() req) {
@@ -132,6 +177,18 @@ export class MedicamentoController {
   obtenerMedicamentosConVariantes(@Req() req) {
     return this.medicamentoService
       .obtenerMedicamentosConVariantes()
+      .then(async (data) => {
+        return data;
+      })
+      .catch((error) => {
+        throw new BadRequestException([error]);
+      });
+  }
+  @Get('variantes/:id')
+  @UseGuards(JwtAuthGuard)
+  obtenerVariantesDemedicamento(@Req() req, @Param('id') id) {
+    return this.medicamentoService
+      .obtenerVariantesDemedicamento(id)
       .then(async (data) => {
         return data;
       })

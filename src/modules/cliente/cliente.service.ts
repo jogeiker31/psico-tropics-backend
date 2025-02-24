@@ -18,4 +18,19 @@ export class ClienteService {
       return nuevoCliente;
     }
   }
+  async buscarClientePorId(id: string) {
+    return await this.clienteModel.findById(id);
+  }
+
+  async buscarClientes(query?: string) {
+    query = query || '';
+    return await this.clienteModel.find({
+      $or: [
+        { cedula: { $regex: query, $options: 'i' } },
+        { nombre_apellido: { $regex: query, $options: 'i' } },
+        { direccion: { $regex: query, $options: 'i' } },
+        { telefono: { $regex: query, $options: 'i' } },
+      ],
+    });
+  }
 }

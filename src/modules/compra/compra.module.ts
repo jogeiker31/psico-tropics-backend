@@ -26,5 +26,6 @@ import { RecordModule } from '../record/record.module';
     RecordModule
   ],
   providers: [CompraService],
+  exports:[MongooseModule]
 })
 export class CompraModule {}

@@ -17,6 +17,15 @@ export class CreateMedicamentoDto {
   @IsNotEmpty()
   limite: number;
 }
+export class editMedicamentoDto {
+  @IsString()
+  @IsOptional()
+  principio_activo?: string;
+
+  @IsNumber()
+  @IsOptional()
+  limite?: number;
+}
 
 export class CreateMedicamentoVarianteDto {
   @IsMongoId()

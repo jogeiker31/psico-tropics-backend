@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { MetricsService } from './metrics.service';
 import { JwtAuthGuard } from 'src/jwt-auth.guard';
 
@@ -10,5 +10,15 @@ export class MetricsController {
   @Get('')
   getMetrics() {
     return this.metricsService.getmetrics();
+  }
+  @UseGuards(JwtAuthGuard) // Protege este endpoint
+  @Get('by-month/:date')
+  getMetricsByMonth(@Param('date') date) {
+    const newDate = new Date(date);
+    console.log(newDate)
+    return this.metricsService.getMedicamentosVendidosEnMes(
+      newDate.getMonth() + 1,
+      newDate.getFullYear(),
+    );
   }
 }

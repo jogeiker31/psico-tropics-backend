@@ -75,6 +75,35 @@ export class CompraController {
         throw new BadRequestException([error.toString()]);
       });
   }
+
+  @Get('compras-cliente/:id')
+  @UseGuards(JwtAuthGuard)
+  obtenerComprasPorCliente(@Req() req, @Param('id') id) {
+    return this.compraService
+      .obtenerComprasPorCliente(id)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        throw new BadRequestException([error.toString()]);
+      });
+  }
+
+
+  @Get('medicamentos-cliente/:id')
+  @UseGuards(JwtAuthGuard)
+  obtenerMedicamentosMasComprados(@Req() req, @Param('id') id) {
+    return this.compraService
+      .obtenerMedicamentosMasComprados(id)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        throw new BadRequestException([error.toString()]);
+      });
+  }
+
+  
   @Get('numero-orden/:numero_orden')
   @UseGuards(JwtAuthGuard)
   obtenerCompraPorNumeroOrden(@Param('numero_orden') numero_orden, @Req() req) {

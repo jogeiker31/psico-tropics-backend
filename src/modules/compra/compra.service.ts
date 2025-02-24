@@ -39,6 +39,55 @@ export class CompraService {
         populate: { path: 'principio_activo', select: 'principio_activo' },
       });
   }
+
+  async obtenerComprasPorCliente(clienteId: string) {
+    const comprasAgrupadas = await this.compraModel.aggregate([
+      { $match: { cliente: new Types.ObjectId(clienteId) } }, // Filtra por cliente
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+          },
+          compras: { $push: '$$ROOT' }, // Guarda todas las compras de ese mes/año
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $concat: [
+              { $toString: '$_id.month' },
+              '/',
+              { $toString: '$_id.year' },
+            ],
+          },
+          compras: 1,
+        },
+      },
+      { $sort: { date: -1 } }, // Ordena desde el mes más reciente al más antiguo
+    ]);
+
+    for (const grupo of comprasAgrupadas) {
+      grupo.compras = await this.compraModel.populate(grupo.compras, [
+        { path: 'doctor', model: 'Usuario', select: 'nombre_apellido cedula' },
+
+        {
+          path: 'medicamentos.id',
+          model: 'VarianteMedicamento',
+          select: 'principio_activo marca',
+          populate: {
+            path: 'principio_activo',
+            model: 'Medicamento',
+            select: 'principio_activo',
+          },
+        },
+      ]);
+    }
+
+    return comprasAgrupadas;
+  }
+
   async obtenerCompraPorNumeroDeOrden(numero_orden: string) {
     return this.compraModel
       .findOne({ numero_orden })
@@ -267,7 +316,62 @@ export class CompraService {
       (c) => c._id.toString() === principioActivo.toString(),
     );
     const cantidadActual = compraExistente ? compraExistente.totalComprado : 0;
-    console.log(limitePermitido, cantidadActual, cantidadDeseada);
     return limitePermitido - cantidadActual; // Puede comprar
+  }
+
+  async obtenerMedicamentosMasComprados(clienteId: string) {
+    const resultado = await this.compraModel.aggregate([
+      { $match: { cliente: new Types.ObjectId(clienteId) } }, // Filtrar por cliente
+
+      { $unwind: '$medicamentos' }, // Descomponer el array de medicamentos
+
+      {
+        $group: {
+          _id: '$medicamentos.id',
+          cantidadTotal: { $sum: '$medicamentos.cantidad' }, // Sumar la cantidad de cada medicamento
+        },
+      },
+
+      { $sort: { cantidadTotal: -1 } }, // Ordenar de mayor a menor
+
+      // Lookup para obtener la variante del medicamento
+      {
+        $lookup: {
+          from: 'variantemedicamentos', // Colección de variantes
+          localField: '_id',
+          foreignField: '_id',
+          as: 'variante',
+        },
+      },
+      { $unwind: '$variante' },
+
+      // Lookup para obtener el medicamento principal y su principio activo
+      {
+        $lookup: {
+          from: 'medicamentos', // Colección principal de medicamentos
+          localField: 'variante.principio_activo',
+          foreignField: '_id',
+          as: 'medicamento',
+        },
+      },
+      { $unwind: '$medicamento' },
+      {
+        $group: {
+          _id: '$medicamento.principio_activo',
+          cantidadTotal: { $sum: '$cantidadTotal' }, // Sumar correctamente todas las variantes
+        },
+      },
+
+      { $sort: { cantidadTotal: -1 } },
+      {
+        $project: {
+          _id: 0, // No mostrar el _id de MongoDB
+          principioActivo: '$_id', // Mostrar el principio activo correctamente
+          cantidadTotal: 1,
+        },
+      },
+    ]);
+
+    return resultado;
   }
 }

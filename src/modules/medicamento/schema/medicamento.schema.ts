@@ -8,6 +8,8 @@ export class Medicamento {
 
   @Prop({ required: true })
   limite: number;
+  @Prop({ default: false })
+  deleted: boolean;
 }
 
 export const MedicamentoSchema = SchemaFactory.createForClass(Medicamento);
