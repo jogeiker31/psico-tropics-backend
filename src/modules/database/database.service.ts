@@ -25,10 +25,11 @@ export class DatabaseService {
   async restoreDatabase(filename: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const backupPath = path.join(__dirname, '../../../backups/', filename);
-    
+
       const command = `mongorestore --uri="mongodb://localhost:27017/psico-tropics" --archive=${backupPath} --gzip --drop`;
 
       exec(command, (error) => {
+        console.log(error);
         if (error) {
           reject(`Error al restaurar la base de datos: ${error.message}`);
         } else {

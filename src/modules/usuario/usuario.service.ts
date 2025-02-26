@@ -18,10 +18,10 @@ export class UsuarioService {
 
     if (partes.length > 1) {
       // Si hay apellido, usar la inicial del nombre + el apellido
-      usuarioBase = `${inicial}.${this.capitalize(partes[1])}`;
+      usuarioBase = `${inicial}.${partes[1]}`;
     } else {
       // Si no hay apellido, usar la inicial del nombre + el nombre completo
-      usuarioBase = `${inicial}.${this.capitalize(partes[0])}`;
+      usuarioBase = `${inicial}.${partes[0]}`;
     }
 
     return usuarioBase;
@@ -137,10 +137,13 @@ export class UsuarioService {
     }
 
     // Modificar los valores únicos agregando "_xxx"
-    usuario.cedula += '_xxx';
-    usuario.codigo_farmaceutico += '_xxx';
-    usuario.codigo_colaborador += '_xxx';
-    usuario.nombre_usuario += '_xxx';
+
+    const string = new Date().getMilliseconds().toString().substring(-4);
+
+    usuario.cedula += '_xxx' + string;
+    usuario.codigo_farmaceutico += '_xxx'  + string;
+    usuario.codigo_colaborador += '_xxx'  + string;
+    usuario.nombre_usuario += '_xxx'  + string;
     usuario.deleted = true;
 
     const resultado = await usuario.save();
