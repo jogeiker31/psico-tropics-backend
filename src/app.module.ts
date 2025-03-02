@@ -11,10 +11,12 @@ import { UsuarioModule } from './modules/usuario/usuario.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { MedicamentoModule } from './modules/medicamento/medicamento.module';
 import { CompraModule } from './modules/compra/compra.module';
+var databaseurldev = "mongodb://localhost/psico-tropics"
+var databaseurlqa = "mongodb://mongo:wTzqrSMYbxsSOAcXvFJgxesKmLEzOtST@mainline.proxy.rlwy.net:19525"
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/psico-tropics'),
+    MongooseModule.forRoot(databaseurlqa),
 
     AuthModule,
 
