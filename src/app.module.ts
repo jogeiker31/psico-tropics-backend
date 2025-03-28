@@ -16,7 +16,7 @@ var databaseurlqa = "mongodb://mongo:wTzqrSMYbxsSOAcXvFJgxesKmLEzOtST@mainline.p
 
 @Module({
   imports: [
-    MongooseModule.forRoot(databaseurlqa),
+    MongooseModule.forRoot(databaseurldev),
 
     AuthModule,
 

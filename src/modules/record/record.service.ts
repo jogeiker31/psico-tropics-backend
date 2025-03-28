@@ -13,11 +13,14 @@ export class RecordService {
   }
 
   getAll(startDate: string, endDate: string) {
+
+    const _endDate = new Date(endDate);
+    _endDate.setHours(23, 59);
     return this.recordMOdel
       .find({
         createdAt: {
           $gte: new Date(startDate), // Fecha de inicio (mayor o igual)
-          $lte: new Date(endDate), // Fecha de fin (menor o igual)
+          $lte: new Date(_endDate), // Fecha de fin (menor o igual)
         },
       })
 

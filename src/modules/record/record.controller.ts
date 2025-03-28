@@ -28,7 +28,11 @@ export class RecordController {
 
     // Configurar la respuesta para enviar el PDF al cliente
     const start = this.formatDate(new Date(startDate));
+ 
     const end = this.formatDate(new Date(endDate));
+
+    
+
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="bitacora_${start}_to_${end}.pdf"`, // Usamos el realName aquí
@@ -42,10 +46,7 @@ export class RecordController {
       .moveDown(10); // Espacio después de la imagen
 
     // Título centrado
-    doc
-      .fontSize(20)
-      .text('PSICO-TROPICS', { align: 'center' })
-      .moveDown(1); // Espacio después del título
+    doc.fontSize(20).text('PSICO-TROPICS', { align: 'center' }).moveDown(1); // Espacio después del título
 
     // Título del documento
     doc
